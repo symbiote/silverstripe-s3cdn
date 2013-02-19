@@ -3,7 +3,7 @@
 	"description": "S3 CDN services for the content-services module",
 	"version": "0.0.1",
 	"type": "silverstripe-module",
-	"keywords": ["silverstripe", "file", "filesystem", "s3", "amazon"],
+	"keywords": ["silverstripe", "cdn", "file", "filesystem", "s3", "amazon"],
 	"license": "BSD-3-Clause",
 	"authors": [
 	{
