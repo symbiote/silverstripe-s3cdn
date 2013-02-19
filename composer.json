@@ -10,5 +10,8 @@
 		"name": "Marcus Nyeholt",
 		"email": "marcus@silverstripe.com.au"
 	}
-	]
+	],
+	"require": {
+		"aws/aws-sdk-php": "*"
+	}
 }

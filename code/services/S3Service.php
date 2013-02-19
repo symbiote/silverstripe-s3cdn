@@ -1,5 +1,4 @@
 <?php
-require_once dirname(__DIR__) . '/thirdparty/aws.phar';
 
 use Aws\Common\Aws;
 use Aws\S3\Exception\S3Exception;
