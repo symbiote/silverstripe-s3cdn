@@ -1,0 +1,16 @@
+---
+Name: s3services
+---
+Injector:
+  S3Service:
+    constructor:
+#      - api-key
+#      - secret
+  S3ContentReader:
+    type: prototype
+    properties:
+      s3service: %$S3Service
+  S3ContentWriter:
+    type: prototype
+    properties:
+      s3service: %$S3Service
