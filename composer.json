@@ -12,6 +12,7 @@
 	}
 	],
 	"require": {
-		"aws/aws-sdk-php": "*"
+		"aws/aws-sdk-php": "*",
+		"silverstripe/content-services": "*"
 	}
 }
