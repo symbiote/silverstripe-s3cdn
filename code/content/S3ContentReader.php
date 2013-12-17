@@ -15,6 +15,15 @@ class S3ContentReader extends ContentReader {
 	 */
 	public $s3Service;
 	
+	
+	/**
+	 * The base URL to use with the s3 managed asset. Allows the use
+	 * of CloudFront base urls instead. 
+	 *
+	 * @var string
+	 */
+	public $baseUrl = 'https://s3.amazonaws.com';
+	
 	protected function getInfo() {
 		
 	}
@@ -30,8 +39,8 @@ class S3ContentReader extends ContentReader {
 		
 	}
 	
-	public function urlStub() {
-		return 'https://s3.amazonaws.com';
+	public function getBaseUrl() {
+		return $this->baseUrl;
 	}
 
 	/**
@@ -40,7 +49,7 @@ class S3ContentReader extends ContentReader {
 	 * @return string
 	 */
 	public function getURL() {
-		return $this->urlStub() .'/' . $this->bucket .'/' . $this->getId();
+		return $this->getBaseUrl() .'/' . $this->bucket .'/' . $this->getId();
 	}
 	
 	/**
