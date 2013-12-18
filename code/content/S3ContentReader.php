@@ -33,10 +33,7 @@ class S3ContentReader extends ContentReader {
 			return;
 		}
 		
-		$object = $this->s3service->getObject(array('Bucket' => $this->bucket, 'Key' => $this->getId()));
-		
-		return $object != null;
-		
+		return strlen($this->getURL());
 	}
 	
 	public function getBaseUrl() {
@@ -60,4 +57,15 @@ class S3ContentReader extends ContentReader {
 	public function read() {
 		
 	}
+
+	/**
+	 * Check that the object exists remotely
+	 * 
+	 * @return boolean
+	 */
+	public function exists() {
+		$exists = $this->s3Service->doesObjectExist($this->bucket, $this->getId());
+		return $exists;
+	}
+
 }

@@ -13,7 +13,7 @@ class S3ContentWriter extends ContentWriter {
 	/**
 	 * @var S3Client
 	 */
-	public $s3service;
+	public $s3Service;
 
 	public function nameToId($name) {
 		return md5($name) . '/' . basename($name);
@@ -55,7 +55,7 @@ class S3ContentWriter extends ContentWriter {
 			$attrs['ContentType'] = $type;
 		}
 
-		$result = $this->s3service->putObject($attrs);
+		$result = $this->s3Service->putObject($attrs);
 		
 		if (!$result) {
 			throw new Exception("Failed uploading to S3");
@@ -65,6 +65,6 @@ class S3ContentWriter extends ContentWriter {
 	}
 
 	public function delete() {
-		$result = $this->s3service->deleteObject(array('Bucket' => $this->bucket, 'Key' => $this->getId()));
+		$result = $this->s3Service->deleteObject(array('Bucket' => $this->bucket, 'Key' => $this->getId()));
 	}
 }
