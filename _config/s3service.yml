@@ -9,8 +9,8 @@ Injector:
   S3ContentReader:
     type: prototype
     properties:
-      s3service: %$S3Service
+      s3Service: %$S3Service
   S3ContentWriter:
     type: prototype
     properties:
-      s3service: %$S3Service
+      s3Service: %$S3Service

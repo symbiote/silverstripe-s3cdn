@@ -14,7 +14,7 @@ class S3ContentWriter extends ContentWriter {
 	 * @var S3Client
 	 */
 	public $s3Service;
-
+	
 	public function nameToId($name) {
 		return md5($name) . '/' . basename($name);
 	}
@@ -54,7 +54,7 @@ class S3ContentWriter extends ContentWriter {
 		if ($type) {
 			$attrs['ContentType'] = $type;
 		}
-
+		
 		$result = $this->s3Service->putObject($attrs);
 		
 		if (!$result) {
@@ -66,5 +66,6 @@ class S3ContentWriter extends ContentWriter {
 
 	public function delete() {
 		$result = $this->s3Service->deleteObject(array('Bucket' => $this->bucket, 'Key' => $this->getId()));
+		return $result;
 	}
 }
