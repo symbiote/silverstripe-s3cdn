@@ -4,13 +4,16 @@ Name: s3services
 Injector:
   S3Service:
     constructor:
-#      - api-key
-#      - secret
+      key: your-key
+      secret: your secret
   S3ContentReader:
     type: prototype
     properties:
       s3Service: %$S3Service
+      bucket: yourbucket
+      baseUrl: 'https://yourbucket.s3.amazonaws.com'
   S3ContentWriter:
     type: prototype
     properties:
       s3Service: %$S3Service
+      bucket: yourbucket
