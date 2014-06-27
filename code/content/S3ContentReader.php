@@ -46,7 +46,8 @@ class S3ContentReader extends ContentReader {
 	 * @return string
 	 */
 	public function getURL() {
-		return $this->getBaseUrl() .'/' . $this->bucket .'/' . $this->getId();
+		//return $this->getBaseUrl() . '/' . $this->bucket . '/' . $this->getId();
+		return $this->getBaseUrl() . '/' . $this->getId();
 	}
 	
 	/**
