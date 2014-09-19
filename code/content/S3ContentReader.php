@@ -95,7 +95,8 @@ class S3ContentReader extends ContentReader {
 			
 			if (isset($objects['CommonPrefixes'])) {
 				foreach ($objects['CommonPrefixes'] as $folder) {
-					$new = new S3ContentReader($folder['Prefix']);
+					$id = $this->getSourceIdentifier() . ContentService::SEPARATOR . $folder['Prefix'];
+					$new = singleton('ContentService')->getReader($id);
 					$new->s3Service = $this->s3Service;
 					$new->bucket = $this->bucket;
 					$new->baseUrl = $this->baseUrl;
@@ -109,8 +110,9 @@ class S3ContentReader extends ContentReader {
 					if ($name == $this->getId()) {
 						continue;
 					}
-					
-					$new = new S3ContentReader($name);
+
+					$id = $this->getSourceIdentifier() . ContentService::SEPARATOR . $name;
+					$new = singleton('ContentService')->getReader($id);
 					$new->s3Service = $this->s3Service;
 					$new->bucket = $this->bucket;
 					$new->baseUrl = $this->baseUrl;
