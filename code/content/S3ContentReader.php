@@ -139,6 +139,15 @@ class S3ContentReader extends ContentReader {
 	public function getURL() {
 		return $this->getBaseUrl() . '/' . $this->getId();
 	}
+	
+	/**
+	 * Get a secure URL set to expire in $expires seconds time
+	 * 
+	 * @param int $expires
+	 */
+	public function getSecureURL($expires = 60) {
+		return $this->s3Service->getObjectUrl($this->bucket, $this->getId(), time() + $expires);
+	}
 
 	/**
 	 * Read this content as a string
