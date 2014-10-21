@@ -173,4 +173,13 @@ class S3ContentReader extends ContentReader {
 		return $exists;
 	}
 
+	public function providerOfUrl($url) {
+		if (strpos($url, $this->baseUrl) !== false) {
+			$prefix = substr($url, strlen($this->baseUrl) + 1);
+			$id = $this->getSourceIdentifier() . ContentService::SEPARATOR . $prefix;
+			$new = singleton('ContentService')->getReader($id);
+			return $new;
+		}
+		return false;
+	}
 }
