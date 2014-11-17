@@ -27,4 +27,12 @@ In your local configuration, specify something like
 	      s3service: %$S3Service
 	      bucket: {your_bucket_name}
               baseUrl: {base_url_for_bucket}
-
+      ContentService:
+        properties:
+          stores:
+            File:
+              ContentReader: FileContentReader
+              ContentWriter: FileContentWriter
+            S3Bucket:
+              ContentReader: S3ContentReader
+              ContentWriter: S3ContentWriter
