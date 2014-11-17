@@ -17,3 +17,12 @@ Injector:
     properties:
       s3Service: %$S3Service
       bucket: yourbucket
+  ContentService:
+    properties:
+      stores:
+        File:
+          ContentReader: FileContentReader
+          ContentWriter: FileContentWriter
+        S3Bucket:
+          ContentReader: S3ContentReader
+          ContentWriter: S3ContentWriter
