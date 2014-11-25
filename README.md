@@ -2,7 +2,9 @@
 
 ## Configuration
 
-In your local configuration, specify something like
+In your local configuration, specify something like the following to configure
+the content Reader/Writer pair, along with actually binding them to usable 
+content stores for the CDN 
 
     ---
     Name: locals3settings
@@ -27,4 +29,10 @@ In your local configuration, specify something like
 	      s3service: %$S3Service
 	      bucket: {your_bucket_name}
               baseUrl: {base_url_for_bucket}
+	  ContentService:
+	    properties:
+	      stores:
+            S3Bucket:
+              ContentReader: S3ContentReader
+              ContentWriter: S3ContentWriter
 
