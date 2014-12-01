@@ -36,3 +36,19 @@ content stores for the CDN
               ContentReader: S3ContentReader
               ContentWriter: S3ContentWriter
 
+Additionally, ensure you have the CDNFile extensions bound from the cdncontent
+module
+
+```yml
+
+File:
+  extensions:
+    - CDNFile
+Folder: 
+  extensions:
+    - CDNFolder
+
+```
+
+See the [CDN Content](https://github.com/silverstripe-australia/silverstripe-cdncontent) module
+for more details
