@@ -15,9 +15,6 @@ class S3ContentWriter extends ContentWriter {
 	 */
 	public $s3Service;
 	
-	public function nameToId($name) {
-		return md5($name . time()) . '/' . basename($name);
-	}
 	
 	/**
 	 * Write content to storage
