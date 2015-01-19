@@ -12,7 +12,7 @@
 	],
 	"require": {
 		"aws/aws-sdk-php": "*",
-		"silverstripe/content-services": "dev-master",
-		"silverstripe/cdncontent": "dev-master"
+		"silverstripe/content-services": "~1.1",
+		"silverstripe/cdncontent": "~1.1"
 	}
 }
