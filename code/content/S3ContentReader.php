@@ -155,12 +155,18 @@ class S3ContentReader extends ContentReader {
 	 * @return string
 	 */
 	public function read() {
-		$result = $this->s3Service->getObject(array(
-			'Bucket' => $this->bucket,
-			'Key' => $this->getId()
-		));
-
-		return $result['Body'];
+		try {
+			$result = $this->s3Service->getObject(array(
+				'Bucket' => $this->bucket,
+				'Key' => $this->getId()
+			));
+			
+			return $result['Body'];
+			
+		} catch (Exception $ex) {
+			SS_Log::log($ex, SS_Log::WARN);
+			return;
+		}
 	}
 
 	/**
