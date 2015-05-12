@@ -35,10 +35,15 @@ class S3ContentReader extends ContentReader {
 	 */
 	public function getInfo() {
 		if (!$this->s3Info) {
-			$this->s3Info = $this->s3Service->getObject(array(
-				'Bucket' => $this->bucket,
-				'Key' => $this->getId()
-			));
+			$id = $this->getId();
+			if (substr($id, -1) == '/') {
+				$this->s3Info = $this->listId($id);
+			} else {
+				$this->s3Info = $this->s3Service->getObject(array(
+					'Bucket' => $this->bucket,
+					'Key' => $id
+				));
+			}
 		}
 		
 		return $this->s3Info;
@@ -70,11 +75,27 @@ class S3ContentReader extends ContentReader {
 	public function isListable() {
 		$result = $this->getInfo();
 
-		if ($result && isset($result['ContentType']) && $result['ContentType'] === 'application/x-directory') {
+		if ($result && (isset($result['CommonPrefixes']) || isset($result['Contents']))) {
 			return true;
 		}
 
 		return false;
+	}
+	
+	protected $listedItems = null;
+	
+	protected function listId($id) {
+		if ($this->listedItems) {
+			return $this->listedItems;
+		}
+		$this->listedItems = $this->s3Service->listObjects(array(
+			"Bucket" => $this->bucket,
+			"Prefix" => $id,
+			'return_prefixes' => true,
+			'Delimiter'	=> '/',
+		));
+		
+		return $this->listedItems;
 	}
 
 	/**
@@ -84,15 +105,8 @@ class S3ContentReader extends ContentReader {
 	 */
 	public function getList() {
 		if ($this->isListable()) {
-			$objects = $this->s3Service->listObjects(array(
-				"Bucket" => $this->bucket,
-				"Prefix" => $this->getId(),
-				'return_prefixes' => true,
-				'Delimiter'	=> '/',
-			));
-			
 			$list = array();
-			
+			$objects = $this->listId($this->getId());
 			if (isset($objects['CommonPrefixes'])) {
 				foreach ($objects['CommonPrefixes'] as $folder) {
 					$id = $this->getSourceIdentifier() . ContentService::SEPARATOR . $folder['Prefix'];
