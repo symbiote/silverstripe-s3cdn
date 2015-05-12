@@ -14,5 +14,10 @@
 		"aws/aws-sdk-php": "*",
 		"silverstripe/content-services": "~1.1",
 		"silverstripe/cdncontent": "~1.1"
+	},
+	"extra": {
+		"branch-alias": {
+			"dev-master": "1.2.x-dev"
+		}
 	}
 }
