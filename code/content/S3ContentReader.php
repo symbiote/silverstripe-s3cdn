@@ -88,6 +88,9 @@ class S3ContentReader extends ContentReader {
 		if ($this->listedItems) {
 			return $this->listedItems;
 		}
+		if ($id === '/') {
+			$id = '';
+		}
 		$this->listedItems = $this->s3Service->listObjects(array(
 			"Bucket" => $this->bucket,
 			"Prefix" => $id,
