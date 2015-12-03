@@ -14,7 +14,8 @@ class S3ContentWriter extends ContentWriter {
 	 * @var S3Client
 	 */
 	public $s3Service;
-	
+
+    public $defaultAcl = CannedAcl::PUBLIC_READ;
 	
 	/**
 	 * Write content to storage
@@ -45,7 +46,7 @@ class S3ContentWriter extends ContentWriter {
 			'Bucket' => $this->bucket,
 			'Key'    => $this->id,
 			'Body'   => $reader->read(),
-			'ACL'    => CannedAcl::PUBLIC_READ
+			'ACL'    => $this->defaultAcl,
 		);
 		
 		if ($type) {

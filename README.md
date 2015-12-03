@@ -50,5 +50,18 @@ Folder:
 
 ```
 
+
+To change the default ACL applied on upload reconfigure the `defaultAcl` option
+
+```
+Injector
+  S3ContentWriter:
+    type: prototype
+    properties:
+      s3Service: %$S3Service
+      bucket: bucket
+      defaultAcl: ""
+```
+
 See the [CDN Content](https://github.com/silverstripe-australia/silverstripe-cdncontent) module
 for more details
