@@ -182,7 +182,7 @@ class S3ContentReader extends ContentReader {
 			
 		} catch (Exception $ex) {
 			SS_Log::log($ex, SS_Log::WARN);
-			return;
+			throw $ex;
 		}
 	}
 
