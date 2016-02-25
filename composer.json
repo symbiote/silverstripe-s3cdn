@@ -13,7 +13,7 @@
 	"require": {
 		"aws/aws-sdk-php": "~2.8.0",
 		"silverstripe/content-services": "~1.2",
-		"silverstripe/cdncontent": ">=1.2,<=2.1"
+		"silverstripe/cdncontent": ">=1.2.0,<=2.1.0"
 	},
 	"extra": {
 		"branch-alias": {
