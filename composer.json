@@ -12,12 +12,12 @@
 	],
 	"require": {
 		"aws/aws-sdk-php": "~2.8.0",
-		"silverstripe/content-services": "~1.2",
+		"silverstripe/content-services": ">=1.2,<=2.1",
 		"silverstripe/cdncontent": "~1.2"
 	},
 	"extra": {
 		"branch-alias": {
-			"dev-master": "1.3.x-dev"
+			"dev-master": "1.4.x-dev"
 		}
 	}
 }
