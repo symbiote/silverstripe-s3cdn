@@ -17,7 +17,12 @@ class S3ContentWriter extends ContentWriter {
 
     public $defaultAcl = CannedAcl::PUBLIC_READ;
     
+    public $hashedNames = false;
+    
     public function nameToId($name) {
+        if ($this->hashedNames) {
+            return parent::nameToId($name);
+        }
 		return strpos($name, 'assets/') === 0 ? substr($name, 7) : $name;
 	}
 	
