@@ -16,6 +16,10 @@ class S3ContentWriter extends ContentWriter {
 	public $s3Service;
 
     public $defaultAcl = CannedAcl::PUBLIC_READ;
+    
+    public function nameToId($name) {
+		return strpos($name, 'assets/') === 0 ? substr($name, 7) : $name;
+	}
 	
 	/**
 	 * Write content to storage
