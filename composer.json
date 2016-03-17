@@ -11,7 +11,7 @@
 	}
 	],
 	"require": {
-		"aws/aws-sdk-php": "~3.0.0",
+		"aws/aws-sdk-php": "~3.0",
 		"silverstripe/content-services": "~1.2",
 		"silverstripe/cdncontent": "~2.0"
 	},
