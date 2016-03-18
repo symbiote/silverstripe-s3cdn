@@ -1,7 +1,5 @@
 <?php
 
-use Aws\S3\Enum\CannedAcl;
-
 /**
  * @author marcus@silverstripe.com.au
  * @license BSD License http://silverstripe.org/bsd-license/
@@ -15,7 +13,7 @@ class S3ContentWriter extends ContentWriter {
 	 */
 	public $s3Service;
 
-    public $defaultAcl = CannedAcl::PUBLIC_READ;
+    public $defaultAcl = 'public-read';
     
     public $hashedNames = false;
     

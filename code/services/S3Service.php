@@ -1,6 +1,6 @@
 <?php
 
-use Aws\Common\Aws;
+use Aws\S3\S3Client;
 use Aws\S3\Exception\S3Exception;
 
 /**
@@ -14,11 +14,14 @@ class S3Service {
 	public function __construct($key, $secret, $region = 'us-east-1') {
 		
 		// Instantiate an S3 client
-		$this->s3 = Aws::factory(array(
-			'key'    => $key,
-			'secret' => $secret,
-			'region' => $region
-		))->get('s3');
+		$this->s3 = new S3Client(array(
+			'region' => $region,
+            'version' => '2006-03-01',
+            'credentials' => [
+                'key'    => $key,
+                'secret' => $secret
+            ]
+		));
 	}
 	
 	public function __call($name, $arguments) {

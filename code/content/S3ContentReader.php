@@ -156,6 +156,12 @@ class S3ContentReader extends ContentReader {
 	public function getURL() {
 		return $this->getBaseUrl() . '/' . $this->getId();
 	}
+    
+    public function getBaseHost() {
+        $base = $this->baseUrl;
+        $bit = parse_url($base, PHP_URL_HOST);
+        return $bit;
+    }
 	
 	/**
 	 * Get a secure URL set to expire in $expires seconds time
@@ -163,7 +169,14 @@ class S3ContentReader extends ContentReader {
 	 * @param int $expires
 	 */
 	public function getSecureURL($expires = 60) {
-		return $this->s3Service->getObjectUrl($this->bucket, $this->getId(), time() + $expires);
+        $cmd = $this->s3Service->getCommand('GetObject', [
+            'Host'  => $this->getBaseHost(),
+            'Bucket' => $this->bucket,
+            'Key' => $this->getId()
+        ]);
+        $request = $this->s3Service->createPresignedRequest($cmd, '+' . $expires . ' seconds');
+        $url = (string) $request->getUri();
+        return $url;
 	}
 
 	/**
