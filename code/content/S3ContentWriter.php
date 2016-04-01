@@ -13,15 +13,37 @@ class S3ContentWriter extends ContentWriter {
 	 */
 	public $s3Service;
 
+    /**
+     * What initial permission should assets be given?
+     *
+     * @var string
+     */
     public $defaultAcl = 'public-read';
     
+    /**
+     * Should this be prefixed in the remote store?
+     *
+     * @var string
+     */
+    public $prefix;
+    
+    /**
+     * Should names be hashed by default?
+     *
+     * @var boolean
+     */
     public $hashedNames = false;
     
     public function nameToId($name) {
+        $nameId = '';
         if ($this->hashedNames) {
-            return parent::nameToId($name);
+            $nameId = parent::nameToId($name);
+        } else {
+            $nameId = strpos($name, 'assets/') === 0 ? substr($name, 7) : $name;
         }
-		return strpos($name, 'assets/') === 0 ? substr($name, 7) : $name;
+        
+        return $this->prefix ? $this->prefix . '/' . $nameId : $nameId;
+		
 	}
 	
 	/**
@@ -42,7 +64,7 @@ class S3ContentWriter extends ContentWriter {
 			if (!$name) {
 				throw new Exception("Cannot write a file without a name");
 			}
-			$this->id = $this->nameToId($fullname);
+			$this->setId($this->nameToId($fullname));
 		}
 
 		$type = null;
@@ -51,7 +73,7 @@ class S3ContentWriter extends ContentWriter {
 		}
 		$attrs = array(
 			'Bucket' => $this->bucket,
-			'Key'    => $this->id,
+			'Key'    => $this->getId(),
 			'Body'   => $reader->read(),
 			'ACL'    => $this->defaultAcl,
 		);
