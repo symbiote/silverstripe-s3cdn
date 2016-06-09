@@ -54,7 +54,7 @@ class S3ContentWriter extends ContentWriter {
 	 *				The name that is used to refer to this piece of content, 
 	 *				if needed
 	 */
-	public function write($content = null, $fullname = '') {
+	public function write($content = null, $fullname = '', $type = null) {
 		
 		$reader = $this->getReaderWrapper($content);
 		
@@ -67,7 +67,6 @@ class S3ContentWriter extends ContentWriter {
 			$this->setId($this->nameToId($fullname));
 		}
 
-		$type = null;
 		if (class_exists('HTTP')) {
 			$type = HTTP::get_mime_type($name);
 		}
