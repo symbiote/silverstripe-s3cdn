@@ -67,7 +67,7 @@ class S3ContentWriter extends ContentWriter {
 			$this->setId($this->nameToId($fullname));
 		}
 
-		if (class_exists('HTTP')) {
+		if (class_exists('HTTP') && strlen($name)) {
 			$type = HTTP::get_mime_type($name);
 		}
 		$attrs = array(
@@ -77,7 +77,8 @@ class S3ContentWriter extends ContentWriter {
 			'ACL'    => $this->defaultAcl,
 		);
 		
-		if ($type) {
+        // protect against writing an odd content type
+		if ($type && $type != 'application/unknown' && $type != 'directory') {
 			$attrs['ContentType'] = $type;
 		}
 		
