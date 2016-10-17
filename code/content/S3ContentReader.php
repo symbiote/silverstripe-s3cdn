@@ -154,7 +154,12 @@ class S3ContentReader extends ContentReader {
 	 * @return string
 	 */
 	public function getURL() {
-		return $this->getBaseUrl() . '/' . $this->getId();
+        $id = $this->getId();
+        $parts = explode('/', $id);
+        array_walk($parts, function (&$segment) {
+            $segment = rawurlencode($segment);
+        });
+		return $this->getBaseUrl() . '/' . implode('/', $parts);
 	}
     
     public function getBaseHost() {
@@ -190,9 +195,7 @@ class S3ContentReader extends ContentReader {
 				'Bucket' => $this->bucket,
 				'Key' => $this->getId()
 			));
-			
 			return $result['Body'];
-			
 		} catch (Exception $ex) {
 			SS_Log::log($ex, SS_Log::WARN);
 			throw $ex;
