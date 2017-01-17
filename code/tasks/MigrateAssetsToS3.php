@@ -1,122 +1,154 @@
 <?php
 
-/**
- * @author marcus
- */
-class MigrateAssetsToS3 extends BuildTask {
-    protected $description = 'Migrate existing File records to S3';
-    
-    public function run($request) {
-		$cdn = $request->getVar('cdn');
-        $prefix = FileNameFilter::create()->filter($request->getVar('prefix'));
-        if ($prefix) {
-            $prefix = trim($prefix, '/') . '/';
+class MigrateAmazonS3Task extends BuildTask
+{
+    protected $title = "Migrate Amazon S3 Task";
+
+    protected $description = 'Setup File tables to point to S3 server';
+
+    public function run($request)
+    {
+        if (!Director::is_cli() && !isset($_GET['run'])) {
+            DB::alteration_message('Must add ?run=1 to execute task immediately.', 'error');
+            return false;
         }
-        
-		if (!$cdn) {
-			$this->o("Skipping s3 file setting as cdn variable not supplied");
-			return;
-		}
-        
-        $allFolders = array();
-            
-        if ($folderId = $request->getVar('FolderID')) {
-            $folder = Folder::get()->byID($folderId);
-            if ($folder && $folder->ID) {
-                $allFolders[] = $folder->ID;
-                $allFolders = array_merge($allFolders, $this->childrenOf($folder, $cdn));
+        if (!Director::is_cli()) 
+        {
+            // - Add UTF-8 so characters will render as they should when debugging (so you can visualize inproperly formatted characters easier)
+            // - Add base_tag so that printing blocks of HTML works properly with relative links (helps with visualizing errors)
+?>
+            <head>
+                <?php echo SSViewer::get_base_tag(''); ?>
+                <meta charset="UTF-8">
+            </head>
+<?php
+        }
+
+        $cdn = $request->getVar('cdn');
+        $prefix = $request->getVar('prefix');
+        $folderID = (int)$request->getVar('FolderID');
+        $this->syncFiles($folderID, $cdn, $prefix);
+    }
+
+    public function syncFiles($folderID = 0, $cdn = '', $prefix = '') {
+        if (!$prefix) {
+            $prefix = 'siteassets';
+        }
+
+        // Set defaults
+        $defaultStore = singleton('ContentService')->getDefaultStore();
+        if (!$defaultStore) {
+            throw new Exception('Must configure a "defaultStore" on ContentService in YML.');
+        }
+        if (!$cdn) {
+            // Default to configured CDN
+            $cdn = $defaultStore;
+        }
+        $prefix = FileNameFilter::create()->filter($prefix);
+        if (!$prefix) {
+            throw new LogicException('Empty $prefix not allowed.');
+        }
+        $prefix = $prefix.'/';
+
+        // Get folder
+        $folderIDs = array();
+        if ($folderID) {
+            // If only updating specific FolderID
+            $folder = Folder::get()->byID($folderID);
+            $folderID = ($folder && $folder->exists()) ? (int)$folder->ID : 0;
+            if ($folderID) {
+                $folderIDs[$folderID] = ($folder && $folder->exists()) ? (int)$folder->ID : 0;
             }
         } else {
-            $filter = array(
-                'StoreInCdn' => $cdn,
-            );
-
-            $toStore = Folder::get()->filter($filter);
-
-            foreach ($toStore as $folder) {
-                $allFolders[] = $folder->ID;
-                $allFolders = array_merge($allFolders, $this->childrenOf($folder, $cdn));
+            $folders = array();
+            foreach (Folder::get()->filter(array('StoreInCdn' => $cdn)) as $record) {
+                $folders[$record->ID] = $record;
             }
-
-            $default = singleton('ContentService')->getDefaultStore();
-            if ($default && $default == $cdn) {
-                $allFolders = array_merge($allFolders, $this->childrenOf(0, $cdn));
+            // All top level folders default to the 'defaultStore'
+            if ($cdn && $cdn === $defaultStore) {
+                foreach (Folder::get()->filter(array('ParentID' => 0)) as $record) {
+                    $folders[$record->ID] = $record;
+                }
+                $folderIDs[0] = 0; // Get root/top level File objects
             }
-        }
-        
-        sort($allFolders);
-        
-		$containedFiles = File::get()->filter(array(
-            'ParentID' => $allFolders,
-            'ClassName:not' => 'Folder',
-        ));
-        
-        $containedFiles = $containedFiles->where('("CDNFile" IS NULL OR CDNFile NOT LIKE \'' . Convert::raw2sql($cdn) .  '%\')');
-        
-		foreach ($containedFiles as $file) {
-			if ($file instanceof Folder) {
-				continue;
-			}
-			if (strlen($file->CDNFile) === 0) {
-				$name = $file->Filename;
-                
-				if (strpos($name, 'assets') === 0) {
-					$name = substr($name, 7);
-				}
-				
-				if ($file->ClassName == 'Image') {
-					$file = $file->newClassInstance('CdnImage');
-					$file->defineMethods();
-				}
+            $folders = array_values($folders);
+            while ($folders) {
+                $folder = array_shift($folders);
+                // StoreInCDN being empty = Inherit
+                if (!$folder->StoreInCDN || $folder->StoreInCDN === $cdn) {
+                    $folderID = (int)$folder->ID;
 
-                $cdnPath = $cdn . ':||' . $prefix . $name;
-				$file->CDNFile = $cdnPath;
-				
-                try {
-                    if ($v = $file->doValidate()) {
-                        if ($v->valid()) {
-                            $file->write();
-                        } else {
-                            throw new Exception("File is invalid");
-                        }
+                    // Add this folder to list
+                    $folderIDs[$folderID] = $folderID;
+
+                    // Queue up children to iterate over in this loop
+                    $childFolders = Folder::get()->filter(array('ParentID' => $folderID));
+                    foreach ($childFolders as $childFolder) {
+                        $folders[] = $childFolder;
                     }
-                } catch (Exception $ex) {
-                    // so what
-                    $this->o("Exception updating file $name - " . $ex->getMessage());
                 }
-				
-				$this->o("Updated " . $file->Title . " to " . $file->CDNFile);
-			}
-		}
-    }
-    
-    protected function childrenOf($f, $cdn) {
-        if (!is_int($f)) {
-            $f = $f->ID;
+            }
         }
-		$childFolders = Folder::get()->filter(array(
-			'ParentID'	=> $f
-		));
-		
-		$mykids = array();
-		
-		if ($childFolders && $childFolders->count()) {
-			foreach ($childFolders as $k) {
-                if ($k->StoreInCDN == $cdn || strlen($k->StoreInCDN) == 0) {
-                    $mykids[] = $k->ID;
-                    $itskids = $this->childrenOf($k, $cdn);
-                    $mykids = array_merge($mykids, $itskids);
+        if (!$folderIDs) {
+            throw new Exception('No folders found under "'.$cdn.'" cdn.');
+        }
+
+        // Get List of files
+        $list = File::get()->filter(array(
+            'ClassName:not' => 'Folder',
+            'ParentID' => $folderIDs,
+        ));
+
+        $folderCount = count($folderIDs); 
+        // Count non-existent root folder with +1
+        $folderMaxCount = Folder::get()->count() + 1;
+        $fileCount = $list->count();
+        $this->log('Files to process: '.$fileCount.', in '.$folderCount.'/'.$folderMaxCount.' folders.');
+        foreach ($list as $file) {
+            if ($file instanceof Folder) {
+                continue;
+            }
+            if ($file->ClassName === 'Image') {
+                $file = $file->newClassInstance('CdnImage');
+                $file->defineMethods();
+            }
+
+            $filename = ltrim($file->Filename, ASSETS_DIR.'/');
+            $file->CDNFile = $cdn . ':||' . $prefix . $filename;
+            
+            if (!$file->getChangedFields(true, DataObject::CHANGE_VALUE)) {
+                $this->log('No changes to '.$file->ClassName.' #'.$file->ID);
+                continue;
+            }
+            try {
+                $validationResult = $file->doValidate();
+                if (!$validationResult->valid()) {
+                    $this->log('File #'.$file->ID.' did not validate().');
+                    continue;
                 }
-			}
-		}
-		return $mykids;
-	}
-    
-    protected function o($txt) {
-		if (PHP_SAPI == 'cli') {
-			echo "$txt\n";
-		} else {
-			echo "$txt<br/>\n";
-		}
-	}
+                try {
+                    $file->write();
+                    $this->log('Changed "'.$file->Title.'" ('.$file->class.') #'.$file->ID);
+                } catch (Exception $e) {
+                    $this->log('Failed to write '.$file->ClassName.' #'.$file->ID, 'error', $e);
+                }
+            } catch (Exception $e) {
+                $this->log('Unexpected failure on '.$file->ClassName.' #'.$file->ID, 'error', $e);
+            }
+        }
+    }
+
+    protected function log($message, $type = '', Exception $e = null) {
+        if ($e) {
+            $message .= ' - ' . $e->getMessage();
+        }
+        DB::alteration_message($message, $type);
+        if ($type === 'error') {
+            // Send out the error details to the logger for writing
+            SS_Log::log(
+                $e,
+                SS_Log::ERR
+            );
+        }
+    }
 }
