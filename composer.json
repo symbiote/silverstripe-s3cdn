@@ -1,5 +1,5 @@
 {
-	"name": "silverstripe/s3cdn",
+	"name": "symbiote/silverstripe-s3cdn",
 	"description": "S3 CDN services for the content-services module",
 	"type": "silverstripe-module",
 	"keywords": ["silverstripe", "cdn", "file", "filesystem", "s3", "amazon"],
@@ -17,7 +17,7 @@
 	},
 	"extra": {
 		"branch-alias": {
-			"dev-master": "3.2.x-dev"
+			"dev-master": "4.0.x-dev"
 		}
 	}
 }
