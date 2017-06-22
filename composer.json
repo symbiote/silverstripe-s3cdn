@@ -12,8 +12,8 @@
 	],
 	"require": {
 		"aws/aws-sdk-php": "~3.0",
-		"silverstripe/content-services": "~1.2",
-		"silverstripe/cdncontent": "~2.0"
+		"symbiote/silverstripe-content-services": "~1.2",
+		"symbiote/silverstripe-cdncontent": "~2.0"
 	},
 	"extra": {
 		"branch-alias": {
