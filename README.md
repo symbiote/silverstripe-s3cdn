@@ -63,5 +63,5 @@ Injector
       defaultAcl: ""
 ```
 
-See the [CDN Content](https://github.com/silverstripe-australia/silverstripe-cdncontent) module
+See the [CDN Content](https://github.com/symbiote/silverstripe-cdncontent) module
 for more details

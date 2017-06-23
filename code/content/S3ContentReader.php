@@ -3,7 +3,7 @@
 /**
  * Read content from haylix cdn
  *
- * @author marcus@silverstripe.com.au
+ * @author marcus@symbiote.com.au
  * @license BSD License http://silverstripe.org/bsd-license/
  */
 class S3ContentReader extends ContentReader {
