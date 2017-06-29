@@ -19,5 +19,8 @@
 		"branch-alias": {
 			"dev-master": "4.0.x-dev"
 		}
+	},
+	"replace": {
+		"silverstripe/s3cdn": "self.version"
 	}
 }
