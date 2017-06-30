@@ -16,6 +16,7 @@
 		"silverstripe/cdncontent": "~2.0"
 	},
 	"extra": {
+		"installer-name": "s3cdn",
 		"branch-alias": {
 			"dev-master": "3.2.x-dev"
 		}
