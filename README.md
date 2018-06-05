@@ -65,3 +65,15 @@ Injector
 
 See the [CDN Content](https://github.com/symbiote/silverstripe-cdncontent) module
 for more details
+
+## Troubleshooting
+
+### Resampled Images
+
+The following queries may need to be run if you've done an SS upgrade and/or swapped to a new URL. This makes sure that all images are resampled correctly.
+
+```
+UPDATE File SET ResamplingsValue = '';
+TRUNCATE TABLE `SilverStripeAustralia\ContentServiceAssets\ContentServiceAsset`;
+TRUNCATE TABLE `Symbiote\ContentServiceAssets\ContentServiceAsset`;
+```
