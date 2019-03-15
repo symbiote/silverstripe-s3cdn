@@ -68,6 +68,10 @@ Injector
 See the [CDN Content](https://github.com/symbiote/silverstripe-cdncontent) module
 for more details
 
+## Migrations
+
+If you're looking to migrate either to, or from S3, please take a look at the build tasks included.
+
 ## Troubleshooting
 
 ### Resampled Images
