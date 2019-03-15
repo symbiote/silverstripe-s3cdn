@@ -22,17 +22,19 @@ content stores for the CDN
 	    properties:
 	      s3service: %$S3Service
 	      bucket: {your_bucket_name}
-              baseUrl: {base_url_for_bucket}
+	      baseUrl: https://{your_bucket_name}.s3.amazonaws.com
 	  S3ContentWriter:
 	    type: prototype
 	    properties:
 	      s3service: %$S3Service
 	      bucket: {your_bucket_name}
-              baseUrl: {base_url_for_bucket}
+	      baseUrl: https://{your_bucket_name}.s3.amazonaws.com
 	  ContentService:
+	    constructor:
+	      defaultStore: Default
 	    properties:
 	      stores:
-            S3Bucket:
+            Default:
               ContentReader: S3ContentReader
               ContentWriter: S3ContentWriter
 
