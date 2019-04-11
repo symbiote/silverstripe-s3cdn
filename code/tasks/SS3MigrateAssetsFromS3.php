@@ -16,13 +16,15 @@ class SS3MigrateAssetsFromS3 extends BuildTask
             throw new RuntimeException("This can only be executed from the commandline");
         }
 
-        // The context for the following {src} parameter will be relative to "framework", so "src=../{src}" for example
-        $sourceFolder = trim($request->getVar('src'), "/");
+        // path can be relative or absolute
+        $sourceFolder = trim($request->getVar('src'));
         if (!$sourceFolder || !is_dir($sourceFolder)) {
             throw new RuntimeException("'src' parameter must be a readable folder");
         }
-
-        $sourceFolder .= "/";
+        // ensure trailing slash
+        if (substr($sourceFolder, -1) !== '/') {
+            $sourceFolder .= '/';
+        }
 
         // use passed in IDs for testing if desired
         $ids = $request->getVar('ids');
@@ -49,6 +51,7 @@ class SS3MigrateAssetsFromS3 extends BuildTask
             $sourceFile = str_replace('Default:||', $sourceFolder, $source);
 
             if (file_exists($sourceFile) && is_readable($sourceFile)) {
+                // CWD is framework/ so go up one dir
                 $filename = "../{$file->Filename}";
                 if (!file_exists($filename)) {
                     echo "\tCopying $sourceFile\n";
