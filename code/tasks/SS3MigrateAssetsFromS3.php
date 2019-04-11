@@ -52,7 +52,17 @@ class SS3MigrateAssetsFromS3 extends BuildTask
                 $filename = "../{$file->Filename}";
                 if (!file_exists($filename)) {
                     echo "\tCopying $sourceFile\n";
-                    copy($sourceFile, $filename);
+                    echo "\t -> to $filename\n";
+                    // ensure dir exists
+                    $destDir = dirname($filename);
+                    if (!file_exists($destDir)) {
+                        echo "\t -> mkdir $destDir\n";
+                        mkdir($destDir, 0775, true);
+                    }
+                    // copy file
+                    $result = copy($sourceFile, $filename);
+                    $result = $result ? 'SUCCESS' : 'FAILED';
+                    echo "\t -> $result\n";
                 } else {
                     echo "\tSkipped $sourceFile as the destination already exists\n";
                 }
