@@ -40,6 +40,8 @@ class SS3MigrateAssetsFromS3 extends BuildTask
 
     public function copyFiles(DataList $files, $sourceFolder)
     {
+        $failedDirs = [];
+
         foreach ($files as $file) {
             echo "Processing $file->ID : $file->CDNFile\n";
             /** @var File $file */
@@ -63,15 +65,37 @@ class SS3MigrateAssetsFromS3 extends BuildTask
                         mkdir($destDir, 0775, true);
                     }
                     // copy file
-                    $result = copy($sourceFile, $filename);
-                    $result = $result ? 'SUCCESS' : 'FAILED';
+                    $copied = copy($sourceFile, $filename);
+                    $result = $copied ? 'SUCCESS' : 'FAILED';
                     echo "\t -> $result\n";
+                    // copy complete, change image classname
+                    if ($copied) {
+                        if ($file->ClassName == 'CdnImage') {
+                            $file->ClassName = 'Image';
+                            $file->write();
+                        }
+                    }
+                    // copy failed, record dir for later output
+                    else if (!$copied && !in_array($destDir, $failedDirs)) {
+                        $failedDirs[] = $destDir;
+                    }
                 } else {
-                    echo "\tSkipped $sourceFile as the destination already exists\n";
+                    echo "\tSkipping as the destination already exists\n";
                 }
             } else {
                 echo "\tNo source file found\n";
             }
+        }
+
+        // log failed dirs
+        if (count($failedDirs) > 0) {
+            sort($failedDirs);
+            echo "Failed to copy files to the following directories:\n";
+            foreach ($failedDirs as $dir) {
+                echo "\t -> $dir\n";
+            }
+        } else {
+            echo "Completed without any failures.\n";
         }
     }
 }
