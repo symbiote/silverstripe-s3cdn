@@ -8,6 +8,22 @@
  * ---
 */
 
+// simulate CdnImage incase module has been removed
+if (!class_exists('CdnImage')) {
+    class CdnImage extends \Image
+    {
+        public function getCDNFile()
+        {
+            $id = $this->ID;
+            $res = DB::query("SELECT CDNFile FROM File WHERE ID = $id");
+            if ($res->numRecords() == 1) {
+                return $res->value();
+            }
+            return null;
+        }
+    }
+}
+
 class SS3MigrateAssetsFromS3 extends BuildTask
 {
     public function run($request)
