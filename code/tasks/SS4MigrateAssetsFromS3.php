@@ -4,6 +4,7 @@
  * SS4
  * ---
  * Please see the SS3 version for further information on how to use this.
+ * TODO: Migrate improvements from SS3 task to here.
  * ---
  */
 
