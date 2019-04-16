@@ -26,13 +26,28 @@ if (!class_exists('CdnImage')) {
 
 class SS3MigrateAssetsFromS3 extends BuildTask
 {
+    /**
+     * Runs task, CLI only!
+     *
+     * Args:
+     *  src (required):
+     *      Path to local copy of s3 assets.
+     *      Can be relative or absolute.
+     *      Note that PWD is framework/ so relative paths should begin with ../
+     *  ids (optional):
+     *      List of File ids to filter by.
+     *      IDs should be comma delimitered.
+     *
+     * @param [type] $request
+     * @return void
+     */
     public function run($request)
     {
         if (!Director::is_cli()) {
             throw new RuntimeException("This can only be executed from the commandline");
         }
 
-        // path can be relative or absolute
+        // get path to s3 assets
         $sourceFolder = trim($request->getVar('src'));
         if (!$sourceFolder || !is_dir($sourceFolder)) {
             throw new RuntimeException("'src' parameter must be a readable folder");
@@ -42,10 +57,11 @@ class SS3MigrateAssetsFromS3 extends BuildTask
             $sourceFolder .= '/';
         }
 
-        // use passed in IDs for testing if desired
-        $ids = $request->getVar('ids');
-
+        // files to process
         $files = File::get();
+
+        // filter by ids if supplied
+        $ids = $request->getVar('ids');
         if (strlen($ids)) {
             $ids = explode(",", $ids);
             $files = $files->filter('ID', $ids);
