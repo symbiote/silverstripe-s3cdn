@@ -82,6 +82,17 @@ class S3ContentWriter extends ContentWriter {
 			$attrs['ContentType'] = $type;
 		}
 		
+		// set cache control
+		$cacheControl = Config::inst()->get('S3ContentWriter', 'cache_control');
+		if($cacheControl && is_array($cacheControl)) {
+			$cacheControlType = str_replace('/', "_", $type);
+			if(isset($cacheControl[$cacheControlType])) {
+				$attrs['CacheControl'] = $cacheControl[$cacheControlType];
+			} else if(isset($cacheControl["default"])) {
+				$attrs['CacheControl'] = $cacheControl["default"];
+			}
+		}
+		
 		$result = $this->s3Service->putObject($attrs);
 		
 		if (!$result) {
